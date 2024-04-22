@@ -78,4 +78,3 @@ class User(Base):
     def verify_email(self):
         """Marks the user's email address as verified."""
         self.email_verified = True
-
