@@ -46,4 +46,3 @@ def generate_pagination_links(request: Request, skip: int, limit: int, total_ite
         links.append(create_pagination_link("prev", base_url, {'skip': max(skip - limit, 0), 'limit': limit}))
 
     return links
-
