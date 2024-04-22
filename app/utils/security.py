@@ -1,50 +1,63 @@
-# app/security.py
-from builtins import Exception, ValueError, bool, int, str
-import bcrypt
-from logging import getLogger
+from typing import List
+from urllib.parse import urlencode
+from uuid import UUID
 
-# Set up logging
-logger = getLogger(__name__)
+from fastapi import Request
 
-def hash_password(password: str, rounds: int = 12) -> str:
+from app.schemas.link_schema import Link
+from app.schemas.pagination_schema import PaginationLink
+
+# Utility function to create a link
+def create_link(rel: str, href: str, method: str = "GET", action: str = None) -> Link:
+    return Link(rel=rel, href=href, method=method, action=action)
+
+def create_pagination_link(rel: str, base_url: str, params: dict) -> PaginationLink:
+    # Ensure parameters are added in a specific order
+    query_string = f"skip={params['skip']}&limit={params['limit']}"
+    return PaginationLink(rel=rel, href=f"{base_url}?{query_string}")
+
+def create_user_links(user_id: UUID, request: Request) -> List[Link]:
     """
-    Hashes a password using bcrypt with a specified cost factor.
-    
-    Args:
-        password (str): The plain text password to hash.
-        rounds (int): The cost factor that determines the computational cost of hashing.
+    Generate navigation links for user actions, ensuring each link includes the 'action' field.
+
+    Parameters:
+    - user_id (UUID): The unique identifier of the user.
+    - request (Request): The request object.
 
     Returns:
-        str: The hashed password.
-
-    Raises:
-        ValueError: If hashing the password fails.
+    - List[Link]: A list of Link objects for navigating user-related actions.
     """
-    try:
-        salt = bcrypt.gensalt(rounds=rounds)
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
-        return hashed_password.decode('utf-8')
-    except Exception as e:
-        logger.error("Failed to hash password: %s", e)
-        raise ValueError("Failed to hash password") from e
+    # Each Link now includes an 'action' field indicating the intended action (view, update, delete)
+    return [
+        Link(rel="self", href=str(request.url_for("get_user", user_id=str(user_id))), method="GET", action="view"),
+        Link(rel="update", href=str(request.url_for("update_user", user_id=str(user_id))), method="PUT", action="update"),
+        Link(rel="delete", href=str(request.url_for("delete_user", user_id=str(user_id))), method="DELETE", action="delete"),
+    ]
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """
-    Verifies a plain text password against a hashed password.
-    
-    Args:
-        plain_password (str): The plain text password to verify.
-        hashed_password (str): The bcrypt hashed password.
 
-    Returns:
-        bool: True if the password is correct, False otherwise.
 
-    Raises:
-        ValueError: If the hashed password format is incorrect or the function fails to verify.
-    """
-    try:
-        return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
-    except Exception as e:
-        logger.error("Error verifying password: %s", e)
-        raise ValueError("Authentication process encountered an unexpected error") from e
+def generate_pagination_links(request: Request, skip: int, limit: int, total_items: int) -> List[PaginationLink]:
+    links = []
+    total_pages = (total_items + limit - 1) // limit
+    base_url = str(request.url)
 
+    # Self link
+    links.append(PaginationLink(rel="self", href=f"{base_url}?{urlencode({'skip': skip, 'limit': limit})}"))
+
+    # First page link
+    links.append(PaginationLink(rel="first", href=f"{base_url}?{urlencode({'skip': 0, 'limit': limit})}"))
+
+    # Last page link
+    last_skip = max(0, (total_pages - 1) * limit)
+    links.append(PaginationLink(rel="last", href=f"{base_url}?{urlencode({'skip': last_skip, 'limit': limit})}"))
+
+    # Next page link
+    if skip + limit < total_items:
+        links.append(PaginationLink(rel="next", href=f"{base_url}?{urlencode({'skip': skip + limit, 'limit': limit})}"))
+
+    # Previous page link
+    if skip > 0:
+        prev_skip = max(skip - limit, 0)
+        links.append(PaginationLink(rel="prev", href=f"{base_url}?{urlencode({'skip': prev_skip, 'limit': limit})}"))
+
+    return links
