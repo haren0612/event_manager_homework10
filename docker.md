@@ -95,4 +95,4 @@ This guide will walk you through the process of using Docker Compose to manage a
 - To stop and remove all running containers:
   - **`docker-compose down`**
 
-This guide is structured to provide clear, step-by-step instructions on how to interact with the Dockerized environment defined by your Docker Compose setup, ideal for educational purposes and ensuring students are well-equipped to manage their development environment effectivelyg.
+This guide is structured to provide clear, step-by-step instructions on how to interact with the Dockerized environment defined by your Docker Compose setup, ideal for educational purposes and ensuring students are well-equipped to manage their development environment effectively.

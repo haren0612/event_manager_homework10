@@ -9,5 +9,3 @@ def get_settings():
 async def get_db() -> AsyncSession:
     async for session in get_async_db():
         yield session
-
-
