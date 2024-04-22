@@ -6,8 +6,7 @@ Fastapi is now operational after completing the setup and installation instructi
 
 ## Setup 
 Ensure that the github activities and Docker hub tokens are up to current, and that image builds are triggered as needed.
-The following are the changes that address it.: 
-
+https://github.com/haren0612/event_manager_homework10/commit/1b5476725c2b2c4337768986e1e0154160c29017
 
 ## Testing and Database Management
 
@@ -23,7 +22,7 @@ Database created and accessed via PGAdmin.
 
 1. **authentication mismatch**:
 Issue Link: https://github.com/haren0612/event_manager_homework10/issues/1
-PR Link: https://github.com/haren0612/event_manager_homework10/pull/
+PR Link: https://github.com/haren0612/event_manager_homework10/pull/2
 
 2. **Email standardization**:
 Issue Link: https://github.com/haren0612/event_manager_homework10/issues/3
@@ -51,4 +50,4 @@ Aside from the links for issues and PRs stated above, locate the other links nee
 
 - Links to the closed issues: https://github.com/haren0612/event_manager_homework10/issues?q=is%3Aissue+is%3Aclosed
 - Link to project image deployed to Dockerhub: https://hub.docker.com/repository/docker/haren0612/homework10/general
-- Link to successfull CI/CD: 
+- Link to successfull CI/CD: https://github.com/haren0612/event_manager_homework10/actions/runs/8787400126/job/24112570965
